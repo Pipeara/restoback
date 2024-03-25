@@ -1,11 +1,7 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'rest_back',
-  password: '',
-  port: 5432,
+ allowExitOnIdle: true,
 });
 
 pool.connect((err, client, release) => {
