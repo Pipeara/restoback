@@ -8,6 +8,10 @@ const port = 3000;
 app.use(express.json()); // Middleware para analizar el cuerpo de la solicitud JSON
 app.use(cors()); // Agregar el middleware cors
 
+app.get("/", (req, res) => {
+  res.send("bienvenido"); // Aquí faltaba cerrar el paréntesis y el punto y coma
+});
+
 // Rutas para usuarios
 app.get('/usuarios', consultas.obtenerUsuarios);
 app.get('/usuarios/:id', consultas.obtenerUsuarioPorId);
