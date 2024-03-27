@@ -1,42 +1,27 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-let pool;
-
-// Función para conectar a la base de datos externa
-const conectarBaseDeDatosExterna = () => {
-  pool = new Pool({
-    host: process.env.PGHOST,
-    port: process.env.PGPORT,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    database: process.env.PGDATABASE,
-    
-  });
+const config = {
+  host: process.env.PGHOST,
+  port: process.env.PGPORT,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  allowExitOnIdle: process.env.ALLOW_EXIT_ON_IDLE === 'true',
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  }
 };
 
-// Función para conectar a la base de datos local
-const conectarBaseDeDatosLocal = () => {
-  pool = new Pool({
-    host: process.env.PGHOST_LOCAL,
-    port: process.env.PGPORT_LOCAL,
-    user: process.env.PGUSER_LOCAL,
-    password: process.env.PGPASSWORD_LOCAL,
-    database: process.env.PGDATABASE_LOCAL
-  });
-};
-
-// Intentar conectar a la base de datos externa
-conectarBaseDeDatosExterna();
+const pool = new Pool(config);
 
 pool.connect((err, client, release) => {
   if (err) {
-    console.error('Error al conectarse a la base de datos externa:', err);
-    console.log('Intentando conectar a la base de datos local como respaldo...');
-    conectarBaseDeDatosLocal(); // Intentar conectar a la base de datos local en caso de error
+    console.error('Error al conectarse a la base de datos:', err);
   } else {
     console.log('Conexión a la base de datos exitosa');
-    release(); // Liberar el cliente de la base de datos
+    release();
   }
 });
 
@@ -138,7 +123,10 @@ const editarPlatoPorId = async (req, res) => {
   const { nombre, descripcion, precio, img } = req.body;
   try {
     const result = await pool.query(
-      'UPDATE platos SET nombre = $1, descripcion = $2, precio = $3, img = $4 WHERE id = $5 RETURNING *',
+      `UPDATE platos 
+      SET nombre = $1, descripcion = $2, precio = $3, img = $4 
+      WHERE id = $5 
+      RETURNING *`,
       [nombre, descripcion, precio, img, id]
     );
     if (result.rows.length === 0) {
@@ -162,4 +150,3 @@ module.exports = {
   eliminarPlatoPorId,
   editarPlatoPorId,
 };
-

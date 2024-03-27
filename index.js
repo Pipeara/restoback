@@ -3,7 +3,7 @@ const cors = require('cors');
 const consultas = require('./consultas.js');
 
 const app = express();
-const port = 4000;
+const port = 3000;
 
 app.use(express.json()); // Middleware para analizar el cuerpo de la solicitud JSON
 app.use(cors()); // Agregar el middleware cors
