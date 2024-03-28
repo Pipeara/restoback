@@ -25,6 +25,7 @@ pool.connect((err, client, release) => {
   }
 });
 
+// Función para obtener todos los usuarios
 const obtenerUsuarios = async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM usuarios');
@@ -35,6 +36,7 @@ const obtenerUsuarios = async (req, res) => {
   }
 };
 
+// Función para obtener un usuario por su ID
 const obtenerUsuarioPorId = async (req, res) => {
   const { id } = req.params;
   try {
@@ -50,6 +52,7 @@ const obtenerUsuarioPorId = async (req, res) => {
   }
 };
 
+// Función para obtener todos los platos
 const obtenerPlatos = async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM platos');
@@ -60,6 +63,7 @@ const obtenerPlatos = async (req, res) => {
   }
 };
 
+// Función para obtener un plato por su ID
 const obtenerPlatoPorId = async (req, res) => {
   const { id } = req.params;
   try {
@@ -75,6 +79,7 @@ const obtenerPlatoPorId = async (req, res) => {
   }
 };
 
+// Función para agregar un nuevo plato
 const agregarPlato = async (req, res) => {
   const { nombre, descripcion, precio, img } = req.body;
   try {
@@ -91,18 +96,34 @@ const agregarPlato = async (req, res) => {
 
 const agregarUsuario = async (req, res) => {
   const { email, password } = req.body;
+  
+  // Validar los datos recibidos del formulario
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Correo electrónico y contraseña son campos obligatorios' });
+  }
+
   try {
+    // Verificar si el usuario ya existe en la base de datos
+    const usuarioExistente = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    if (usuarioExistente.rows.length > 0) {
+      return res.status(400).json({ error: 'El usuario ya está registrado' });
+    }
+    
+    // Insertar el nuevo usuario en la base de datos
     const result = await pool.query(
       'INSERT INTO usuarios (email, password) VALUES ($1, $2) RETURNING *',
       [email, password]
     );
-    res.status(201).json(result.rows[0]);
+    
+    res.status(201).json(result.rows[0]); // Devolver el usuario recién registrado
   } catch (error) {
     console.error('Error al agregar usuario:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
 
+
+// Función para eliminar un plato por su ID
 const eliminarPlatoPorId = async (req, res) => {
   const { id } = req.params;
   try {
@@ -118,6 +139,7 @@ const eliminarPlatoPorId = async (req, res) => {
   }
 };
 
+// Función para editar un plato por su ID
 const editarPlatoPorId = async (req, res) => {
   const { id } = req.params;
   const { nombre, descripcion, precio, img } = req.body;
