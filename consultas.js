@@ -121,6 +121,22 @@ const agregarUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
+// Función para eliminar un usuario por su ID
+const eliminarUsuarioPorId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM usuarios WHERE id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+    } else {
+      res.json({ mensaje: 'Usuario eliminado correctamente', usuario: result.rows[0] });
+    }
+  } catch (error) {
+    console.error('Error al eliminar usuario por ID:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
 
 
 // Función para eliminar un plato por su ID
@@ -169,6 +185,7 @@ module.exports = {
   obtenerPlatoPorId,
   agregarPlato,
   agregarUsuario, 
+  eliminarUsuarioPorId,
   eliminarPlatoPorId,
   editarPlatoPorId,
 };

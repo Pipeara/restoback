@@ -16,11 +16,13 @@ app.get("/", (req, res) => {
 app.get('/usuarios', consultas.obtenerUsuarios);
 app.get('/usuarios/:id', consultas.obtenerUsuarioPorId);
 app.post('/usuarios', consultas.agregarUsuario); // Ruta POST para agregar usuarios
+app.delete('/usuarios/:id', consultas.eliminarUsuarioPorId);
 
 // Rutas para platos
 app.get('/platos', consultas.obtenerPlatos);
 app.get('/platos/:id', consultas.obtenerPlatoPorId);
 app.post('/platos', consultas.agregarPlato); // Ruta POST para agregar platos
+
 app.delete('/platos/:id', consultas.eliminarPlatoPorId); // Ruta DELETE para eliminar platos
 app.put('/platos/:id', consultas.editarPlatoPorId); // Ruta PUT para editar platos
 
