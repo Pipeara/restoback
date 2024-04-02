@@ -121,7 +121,27 @@ const agregarUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
-// Función para eliminar un usuario por su ID
+
+// Función para autenticar un usuario
+const autenticarUsuario = async (req, res) => {
+  const { email, password } = req.body;
+  
+  try {
+    // Verificar si el usuario existe en la base de datos y las credenciales son correctas
+    const result = await pool.query('SELECT * FROM usuarios WHERE email = $1 AND password = $2', [email, password]);
+    
+    // Comprobar si se encontró un usuario con las credenciales proporcionadas
+    if (result.rows.length === 1) {
+      res.status(200).json({ message: 'Autenticación exitosa', usuario: result.rows[0] });
+    } else {
+      res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+  } catch (error) {
+    console.error('Error al autenticar usuario:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
 const eliminarUsuarioPorId = async (req, res) => {
   const { id } = req.params;
   try {
@@ -137,9 +157,6 @@ const eliminarUsuarioPorId = async (req, res) => {
   }
 };
 
-
-
-// Función para eliminar un plato por su ID
 const eliminarPlatoPorId = async (req, res) => {
   const { id } = req.params;
   try {
@@ -155,7 +172,6 @@ const eliminarPlatoPorId = async (req, res) => {
   }
 };
 
-// Función para editar un plato por su ID
 const editarPlatoPorId = async (req, res) => {
   const { id } = req.params;
   const { nombre, descripcion, precio, img } = req.body;
@@ -185,6 +201,7 @@ module.exports = {
   obtenerPlatoPorId,
   agregarPlato,
   agregarUsuario, 
+  autenticarUsuario,
   eliminarUsuarioPorId,
   eliminarPlatoPorId,
   editarPlatoPorId,

@@ -16,6 +16,9 @@ app.get("/", (req, res) => {
 app.get('/usuarios', consultas.obtenerUsuarios);
 app.get('/usuarios/:id', consultas.obtenerUsuarioPorId);
 app.post('/usuarios', consultas.agregarUsuario); // Ruta POST para agregar usuarios
+// Ruta para autenticar usuarios
+app.post('/login', consultas.autenticarUsuario);
+
 app.delete('/usuarios/:id', consultas.eliminarUsuarioPorId);
 
 // Rutas para platos
@@ -30,3 +33,4 @@ app.put('/platos/:id', consultas.editarPlatoPorId); // Ruta PUT para editar plat
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+
