@@ -122,18 +122,28 @@ const agregarUsuario = async (req, res) => {
   }
 };
 
-// Función para autenticar un usuario
 const autenticarUsuario = async (req, res) => {
   const { email, password } = req.body;
   
   try {
     // Verificar si el usuario existe en la base de datos y las credenciales son correctas
-    const result = await pool.query('SELECT * FROM usuarios WHERE email = $1 AND password = $2', [email, password]);
+    const result = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
     
-    // Comprobar si se encontró un usuario con las credenciales proporcionadas
+    // Comprobar si se encontró un usuario con el correo electrónico proporcionado
     if (result.rows.length === 1) {
-      res.status(200).json({ message: 'Autenticación exitosa', usuario: result.rows[0] });
+      const usuario = result.rows[0];
+      console.log('Usuario encontrado:', usuario); // Agrega este registro para verificar el usuario encontrado
+      
+      // Comparar la contraseña proporcionada con la contraseña almacenada en la base de datos
+      if (usuario.password === password) {
+        console.log('Contraseña válida'); // Agrega este registro para verificar si la contraseña es correcta
+        res.status(200).json({ message: 'Autenticación exitosa', usuario });
+      } else {
+        console.log('Contraseña inválida:', password); // Agrega este registro para verificar la contraseña proporcionada
+        res.status(401).json({ error: 'Credenciales inválidas' });
+      }
     } else {
+      console.log('Usuario no encontrado para el correo electrónico:', email); // Agrega este registro para verificar si se encontró un usuario
       res.status(401).json({ error: 'Credenciales inválidas' });
     }
   } catch (error) {
